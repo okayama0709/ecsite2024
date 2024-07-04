@@ -13,3 +13,36 @@ import Footer from "../components/footer.astro";
     <Footer />
   </body>
 </html>
+<style lang="scss" is:global>
+  $breakpoints: (
+    'sm': 'screen and (min-width: 576px)',
+    'md': 'screen and (min-width: 768px)',
+    'lg': 'screen and (min-width: 992px)',
+    'xl': 'screen and (min-width: 1200px)',
+) !default;
+
+@mixin media($breakpoint) {
+    @media #{map-get($breakpoints, $breakpoint)} {
+        @content;
+    }
+}
+  body {
+  font-family: "M PLUS 1", sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  li{
+padding: 0;
+margin: 0;
+  }
+  a{
+    text-decoration: none;
+    color: #333;
+  }
+</style>
