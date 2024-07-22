@@ -1,9 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-// import Swiper bundle with all modules installed
-import Swiper from 'swiper/bundle';
-// import styles bundle
-import 'swiper/css/bundle';
+
 
 import goods from "../../data/goods.json";
 export const getStaticPaths = async() => {
@@ -22,8 +19,15 @@ const goodsData = goods.find(({url}) => product === url);
 ---
 
 <Layout>
-
-<img src=`/images/${goodsData.itemphotos[0]}`>
-<p>{goodsData.name}</p>
-<p>{goodsData.price}</p>
+<img src=`/05_ecsite/images/${goodsData.itemphotos[0]}`>
+<div class="content">
+  <p>{goodsData.name}</p>
+  <p>{goodsData.price}</p>
+  {Array.isArray(goodsData.bland) ? (
+          goodsData.bland.map(bland => <p key={bland}>{bland}</p>)
+        ) : (
+          <p>{goodsData.bland}</p>
+        )}
+  <p>{goodsData.colors}</p>
+</div>
 </Layout>
