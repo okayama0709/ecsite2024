@@ -2,6 +2,14 @@
 import Layout from "../../layouts/Layout.astro";
 
 
+
+// 必要なCSSファイルのインポート
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
+
+
 import goods from "../../data/goods.json";
 export const getStaticPaths = async() => {
   return goods.map(({ url }) => {
@@ -14,20 +22,415 @@ export const getStaticPaths = async() => {
 const { product } = Astro.params;
 const goodsData = goods.find(({url}) => product === url);
 
-
-
 ---
 
 <Layout>
-<img src=`/05_ecsite/images/${goodsData.itemphotos[0]}`>
-<div class="content">
-  <p>{goodsData.name}</p>
-  <p>{goodsData.price}</p>
-  {Array.isArray(goodsData.bland) ? (
-          goodsData.bland.map(bland => <p key={bland}>{bland}</p>)
-        ) : (
-          <p>{goodsData.bland}</p>
-        )}
-  <p>{goodsData.colors}</p>
+<div id="demo08" class="gallery02 l-section">
+
+   <div class="imgwrap">
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {goodsData.itemphotos.map(photo => (
+            <div class="swiper-slide">
+              <figure class="slide">
+                <div class="slide-media"><img src={`/05_ecsite/images/${photo}`} alt=""></div>
+              </figure>
+            </div>
+          ))}
+        </div><!-- /swiper-wrapper -->
+        <div class="swiper-controller">
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
+   </div>
+      <div class="content">
+  <p class="title">{goodsData.name}</p>
+   {goodsData.state ? (
+            <p class="price">{goodsData.price}</p>
+          ) : (
+            <p class="price red">SOLD OUT</p>
+          )}
+  <div class="bland">
+    {Array.isArray(goodsData.bland) ? (
+            goodsData.bland.map(bland => <p key={bland}>{bland}</p>)
+          ) : (
+            <p>{goodsData.bland}</p>
+          )}
+  </div>
+  <p class="colors">{goodsData.colors}</p>
+  <p class="text">{goodsData.text}</p>
 </div>
+<div class="cartbox">
+  <button class="add-to-cart">
+    かごに入れる
+  </button>
+   <p class="notice">
+    ※商品購入時の注意<br>
+    ・返品・交換は商品到着後7日以内にご連絡ください。<br>
+    ・セール品の返品・交換はお受けできません。<br>
+    ・商品に欠陥がある場合を除き、返品はお受けできません。<br>
+    ・送料はお客様負担となります。<br>
+    ・商品画像は実際の色味と若干異なる場合があります。<br>
+  </p>
+</div>
+
+    </div> <!-- /swiper-main -->
+
+    <div class="thumb-wrapper">
+      {goodsData.itemphotos.map(photo => (
+        <div class="thumb-media"><img src={`/05_ecsite/images/${photo}`} alt=""></div>
+      ))}
+    </div><!-- /thumb -->
+</div>
+
+
+
+
 </Layout>
+
+
+<script>
+  import Swiper from 'swiper'
+  import { Navigation, Pagination ,EffectFade } from 'swiper/modules'
+
+   const thumb = document.querySelectorAll('.gallery02 .thumb-media');
+
+   const switchThumb = (index) => {
+     document.querySelector('.gallery02 .thumb-media-active').classList.remove('thumb-media-active');
+     thumb[index].classList.add('thumb-media-active');
+   }
+
+   const initSwiper = () => {
+     const mySwiper = new Swiper('.gallery02 .swiper', {
+       modules: [Navigation, Pagination,EffectFade],
+       effect: "fade",
+       fadeEffect: {
+         crossFade: true,
+       },
+       speed: 500,
+       navigation: {
+         nextEl: '.gallery02 .swiper-button-next',
+         prevEl: '.gallery02 .swiper-button-prev',
+       },
+       on: {
+         init: (swiper) => {
+           thumb[swiper.realIndex].classList.add('thumb-media-active');
+           for (let i = 0; i < thumb.length; i++) {
+             thumb[i].onclick = () => {
+               swiper.slideTo(i);
+             };
+           }
+         },
+         slideChange: (swiper) => {
+           switchThumb(swiper.realIndex);
+         },
+       }
+     });
+   }
+
+   // ページの読み込み後にSwiperを初期化
+   document.addEventListener('DOMContentLoaded', initSwiper);
+ </script>
+
+
+<style lang="scss">
+  :root {
+    --easing: cubic-bezier(.2, 1, .2, 1);
+    --transition: .8s var(--easing);
+    --color-base: #f8f8f8;
+    --color-gray: #ddd;
+    --color-theme: #f5695f;
+    --color-theme-darken: #f12617;
+    --box-shadow: .8rem .8rem 1.2rem rgba(0, 0, 0, .05), -.8rem -.8rem 1.2rem #fff;
+    --box-shadow-hover: 1rem 1rem 1.5rem rgba(0, 0, 0, .08), -1rem -1rem 1.5rem #fff;
+    --box-shadow-inset: inset .8rem .8rem 1.2rem rgba(0, 0, 0, .05), inset -.8rem -.8rem 1.2rem #fff;
+    --box-shadow-dark: .8rem .8rem 1.2rem rgba(0, 0, 0, .1), -.8rem -.8rem 1.2rem rgba(#fff,.2);
+  }
+.l-section{
+  width: 90%;
+  height: 100%;
+  margin-inline:auto;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  justify-content: center;
+  column-gap: 30px;
+}
+  .l-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 10rem;
+  }
+
+  [class*=swiper]:focus {
+    outline: none;
+  }
+
+  .slide-media,
+  .thumb-media {
+    position: relative;
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .swiper-button-prev, .swiper-button-next {
+    display: grid;
+    place-content: center;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &::before {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      content: "";
+      border-radius: 50%;
+      background-color: gray;
+    }
+
+    &::after {
+    width: 1rem;
+      height: 1rem;
+      content: "";
+      border: solid var(--color-gray);
+      border-width: 3px 3px 0 0;
+      background-color: gray;
+    }
+  }
+
+  .swiper-button-prev {
+    &::after {
+      margin-left: 0.4rem;
+      transform: rotate(-135deg);
+    }
+  }
+
+  .swiper-button-next {
+    &::after {
+      margin-right: 0.4rem;
+      transform: rotate(45deg);
+    }
+  }
+
+  .swiper-button-disabled {
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .gallery02 {
+    overflow: hidden;
+
+     .swiper {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 720px;
+    }
+
+    .thumb-wrapper {
+      width: fit-content;
+      height: fit-content;
+      max-width: 720px;
+
+    }
+.imgwrap{
+  width: (800/1100)*100%;
+  max-width: 720px;
+  min-width: 390px;
+
+}
+    .swiper {
+      overflow: visible;
+      margin: 0 ;
+    }
+
+    .swiper-fade .swiper-slide {
+      transition-property: opacity, transform !important;
+      pointer-events: none;
+      &.swiper-slide-active {
+        pointer-events: auto;
+      }
+    }
+
+    .swiper-controller {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .swiper-button-prev, .swiper-button-next {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+
+      &.swiper-button-prev {
+        right: calc(100% + 3.2rem);
+      }
+
+      &.swiper-button-next {
+        left: calc(100% + -3.8rem);
+      }
+    }
+
+    .slide {
+      display: block;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+
+      &-media {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+        img {
+          object-fit: cover;
+        }
+      }
+
+      &-title {
+        font-weight: bold;
+        line-height: 1.6;
+        padding: 3.2rem 0;
+      }
+    }
+
+    .thumb-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 100px);
+      grid-template-rows: repeat(10, 100px);
+      gap: 8px;
+
+      @media (max-width: 700px) {
+        display:none;
+      }
+
+      .thumb-media {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        transition: var(--transition);
+        border-radius: 4px;
+        img {
+          transition: var(--transition);
+        }
+
+        &-active {
+          transform: scale(0.9);
+          opacity: 0.5;
+
+          img {
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+  }
+  .content {
+    padding: 2rem .5rem;
+
+    .title {
+      font-size: 2rem;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+
+    .price {
+      font-size: .9rem;
+      color: #444;
+      margin-bottom: 1rem;
+      &::after {
+        display: inline-block;
+        content: '（税込）';
+        font-size: .6rem;
+      }
+    }
+
+    .bland {
+      margin-bottom: 1rem;
+
+      p {
+        font-size: 1rem;
+        color: #444;
+      }
+    }
+
+    .colors {
+      font-size: 1rem;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+
+    .text {
+      font-size: 1rem;
+      color: #444;
+    }
+  }
+  .cartbox{
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    align-items: end;
+     margin:0 1rem 5rem auto;
+  }
+   .add-to-cart {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    color: #fff;
+    background-color: var(--color-theme);
+    border: none;
+    border-radius: 5px;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: background-color var(--transition), box-shadow var(--transition), transform var(--transition);
+
+
+    &:hover {
+      background-color: var(--color-theme-darken);
+      box-shadow: var(--box-shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      background-color: var(--color-theme-darken);
+      box-shadow: var(--box-shadow-inset);
+      transform: translateY(0);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(245, 105, 95, 0.5);
+    }
+  }
+  .notice {
+    width:fit-content;
+    font-size: 0.7rem;
+    color: gray;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid var(--color-gray);
+    border-radius: 5px;
+    text-align: left;
+  }
+  .red{
+    color: red!important;
+  }
+</style>
